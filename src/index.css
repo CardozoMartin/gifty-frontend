@@ -1,0 +1,73 @@
+/* Directivas de Tailwind */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Animación: sube desde abajo con fade in */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.8s ease-out forwards;
+}
+
+.animate-slide-up-delay-1 {
+  opacity: 0;
+  animation: slideUp 0.8s ease-out 0.25s forwards;
+}
+
+.animate-slide-up-delay-2 {
+  opacity: 0;
+  animation: slideUp 0.8s ease-out 0.5s forwards;
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    @apply font-sans text-gray-800 bg-white;
+  }
+
+  /* Los títulos grandes usan Playfair Display */
+  h1, h2, h3 {
+    @apply font-serif;
+  }
+
+  /* Scrollbar personalizada */
+  ::-webkit-scrollbar {
+    width: 4px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-gray-100;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-rosa rounded-full;
+  }
+}
+
+@layer components {
+  /* Botón primario — rosa sólido */
+  .btn-primario {
+    @apply bg-rosa text-white px-6 py-2 rounded font-sans font-semibold text-sm tracking-wide hover:bg-rosa-claro transition-colors duration-200 cursor-pointer inline-block text-center;
+  }
+
+  /* Botón secundario — contorno rosa */
+  .btn-secundario {
+    @apply border-2 border-rosa text-rosa px-6 py-2 rounded font-sans font-semibold text-sm tracking-wide hover:bg-rosa hover:text-white transition-colors duration-200 cursor-pointer inline-block text-center;
+  }
+
+  /* Links de la navbar — usan Lato con tracking amplio, igual al original */
+  .nav-link {
+    @apply font-sans text-sm tracking-wide font-medium text-marino hover:text-rosa transition-colors duration-200;
+  }
+}
