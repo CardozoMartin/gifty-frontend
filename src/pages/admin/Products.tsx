@@ -27,7 +27,7 @@ const AdminProducts = () => {
       {/* Header */}
       <div className="flex items-end justify-between mb-8">
         <div>
-          <p className="text-xs uppercase tracking-widest text-gray-400 font-medium mb-1">Gestión</p>
+          <p className="text-xs uppercase tracking-widest text-gray-500 font-medium mb-1">Gestión</p>
           <h1 className="text-xl font-bold text-gray-800">Productos</h1>
         </div>
         <button
@@ -53,12 +53,12 @@ const AdminProducts = () => {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-50">
-                  <th className="text-left px-6 py-4 text-xs font-semibold text-gray-400 uppercase tracking-widest">Producto</th>
-                  <th className="text-left px-4 py-4 text-xs font-semibold text-gray-400 uppercase tracking-widest">Categoría</th>
-                  <th className="text-right px-4 py-4 text-xs font-semibold text-gray-400 uppercase tracking-widest">Precio</th>
-                  <th className="text-center px-4 py-4 text-xs font-semibold text-gray-400 uppercase tracking-widest">Stock</th>
-                  <th className="text-center px-4 py-4 text-xs font-semibold text-gray-400 uppercase tracking-widest">Estado</th>
-                  <th className="text-center px-4 py-4 text-xs font-semibold text-gray-400 uppercase tracking-widest">Acciones</th>
+                  <th className="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-widest">Producto</th>
+                  <th className="text-left px-4 py-4 text-xs font-semibold text-gray-500 uppercase tracking-widest">Categoría</th>
+                  <th className="text-right px-4 py-4 text-xs font-semibold text-gray-500 uppercase tracking-widest">Precio</th>
+                  <th className="text-center px-4 py-4 text-xs font-semibold text-gray-500 uppercase tracking-widest">Stock</th>
+                  <th className="text-center px-4 py-4 text-xs font-semibold text-gray-500 uppercase tracking-widest">Estado</th>
+                  <th className="text-center px-4 py-4 text-xs font-semibold text-gray-500 uppercase tracking-widest">Acciones</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
@@ -74,7 +74,7 @@ const AdminProducts = () => {
                           />
                         ) : (
                           <div className="w-11 h-11 rounded-xl border border-gray-100 bg-gray-50 flex items-center justify-center">
-                            <ImagePlus size={16} className="text-gray-300" />
+                            <ImagePlus size={16} className="text-gray-400" />
                           </div>
                         )}
                         <span className="font-medium text-gray-800 truncate max-w-48">
@@ -82,7 +82,7 @@ const AdminProducts = () => {
                         </span>
                       </div>
                     </td>
-                    <td className="px-4 py-4 capitalize text-gray-500 text-xs">{producto.categoria}</td>
+                    <td className="px-4 py-4 capitalize text-gray-600 text-xs">{producto.categoria}</td>
                     <td className="px-4 py-4 text-right font-semibold text-rosa">
                       {formatearPrecio(producto.precio)}
                     </td>
@@ -102,14 +102,14 @@ const AdminProducts = () => {
                       <div className="flex items-center justify-center gap-1">
                         <button
                           onClick={() => navigate(`/admin/productos/${producto._id}/editar`)}
-                          className="p-2 text-gray-300 hover:text-rosa hover:bg-[#fce7f3] rounded-lg transition-colors"
+                          className="p-2 text-gray-400 hover:text-rosa hover:bg-[#fce7f3] rounded-lg transition-colors"
                           title="Editar"
                         >
                           <Pencil size={15} />
                         </button>
                         <button
                           onClick={() => setProductoAEliminar(producto._id)}
-                          className="p-2 text-gray-300 hover:text-red-400 hover:bg-red-50 rounded-lg transition-colors"
+                          className="p-2 text-gray-400 hover:text-red-400 hover:bg-red-50 rounded-lg transition-colors"
                           title="Eliminar"
                         >
                           <Trash2 size={15} />
@@ -122,7 +122,7 @@ const AdminProducts = () => {
             </table>
 
             {(!productos || productos.length === 0) && (
-              <div className="text-center py-16 text-gray-300">
+              <div className="text-center py-16 text-gray-400">
                 <ImagePlus size={40} strokeWidth={1} className="mx-auto mb-3" />
                 <p className="text-sm">No hay productos aún</p>
                 <button

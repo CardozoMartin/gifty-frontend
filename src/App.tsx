@@ -10,6 +10,8 @@ import AdminLayout from './components/layout/AdminLayout';
 
 // Auth
 import ProtectedRoute from './components/auth/ProtectedRoute';
+import GuestRoute from './components/auth/GuestRoute';
+import UserProtectedRoute from './components/auth/UserProtectedRoute';
 
 // Componentes del carrito
 import CartSidebar from './components/shop/CartSidebar';
@@ -21,6 +23,13 @@ import ProductDetail from './pages/ProductDetail';
 import HowToBuy from './pages/HowToBuy';
 import Checkout from './pages/Checkout';
 import CustomerAccount from './pages/CustomerAccount';
+import MiCuenta from './pages/MiCuenta';
+
+// Páginas de auth del cliente
+import Login from './pages/auth/Login';
+import Register from './pages/auth/Register';
+import ForgotPassword from './pages/auth/ForgotPassword';
+import VerifyEmail from './pages/auth/VerifyEmail';
 
 // Páginas del panel admin
 import AdminLogin from './pages/admin/Login';
@@ -78,10 +87,22 @@ const App = () => {
             path="/checkout"
             element={<ShopLayout><Checkout /></ShopLayout>}
           />
-          <Route
-            path="/cuenta-mayorista"
-            element={<ShopLayout><CustomerAccount /></ShopLayout>}
-          />
+
+          {/* ── Auth del cliente — solo accesibles si NO está logueado ─── */}
+          <Route element={<GuestRoute />}>
+            <Route path="/login" element={<Login />} />
+            <Route path="/registro" element={<Register />} />
+            <Route path="/recuperar-password" element={<ForgotPassword />} />
+            <Route path="/cuenta-mayorista" element={<ShopLayout><CustomerAccount /></ShopLayout>} />
+          </Route>
+
+          {/* Verificar email — siempre accesible (el link llega por email) */}
+          <Route path="/verificar-email/:token" element={<VerifyEmail />} />
+
+          {/* ── Rutas del cliente logueado ───────────────────────────────── */}
+          <Route element={<UserProtectedRoute />}>
+            <Route path="/mi-cuenta" element={<ShopLayout><MiCuenta /></ShopLayout>} />
+          </Route>
 
           {/* ── Login del admin — público ───────────────────────────────── */}
           <Route path="/admin/login" element={<AdminLogin />} />

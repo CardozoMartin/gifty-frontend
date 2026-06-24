@@ -94,15 +94,15 @@ const ProductDetail = () => {
     );
   }
 
-  // Calcula el % de descuento efectivo
-  const porcentajeDescuento = producto.precioEfectivo < producto.precio
-    ? Math.round(((producto.precio - producto.precioEfectivo) / producto.precio) * 100)
+  // Descuento efectivo desde la config global
+  const pctEfectivo = config?.descuentoEfectivo ?? 0;
+  const precioEfectivo = pctEfectivo > 0
+    ? Math.round(producto.precio * (1 - pctEfectivo / 100))
     : 0;
+  const porcentajeDescuento = pctEfectivo;
 
-  // Aseguramos que la cantidad no baje del mínimo mayorista
   const handleCantidadChange = (valor: number) => {
-    const minimo = producto.cantidadMinima;
-    setCantidad(Math.max(valor, minimo));
+    setCantidad(Math.max(valor, 1));
   };
 
   return (
@@ -200,7 +200,7 @@ const ProductDetail = () => {
               <span className="bg-rosa text-white text-xs font-bold px-2 py-0.5 rounded mr-2">
                 Efectivo {porcentajeDescuento}% OFF
               </span>
-              {formatearPrecio(producto.precioEfectivo)}
+              {formatearPrecio(precioEfectivo)}
             </p>
           )}
 
@@ -212,11 +212,6 @@ const ProductDetail = () => {
           {/* Descripción */}
           <p className="text-gray-600 text-sm leading-relaxed mb-6">
             {producto.descripcion}
-          </p>
-
-          {/* Cantidad mínima mayorista */}
-          <p className="text-sm text-rosa font-medium mb-3">
-            Cantidad mínima mayorista: {producto.cantidadMinima} unidades
           </p>
 
           {/* Selector de cantidad + botón agregar */}

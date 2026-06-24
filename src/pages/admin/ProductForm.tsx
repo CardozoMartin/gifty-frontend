@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import { ArrowLeft, Upload, X, ImagePlus } from 'lucide-react';
+import { useForm, useWatch } from 'react-hook-form';
+import { ArrowLeft, ImageUp, X, Save, Package } from 'lucide-react';
 import {
   useProductById,
   useCreateProduct,
   useUpdateProduct,
   useUploadProductImage,
 } from '../../hooks/useProducts';
+import { useConfig } from '../../hooks/useConfig';
 import { Categoria, ProductoFormData } from '../../types/producto';
 
 const categorias: { label: string; valor: Categoria }[] = [
@@ -20,13 +21,19 @@ const categorias: { label: string; valor: Categoria }[] = [
   { label: 'Otros', valor: 'otros' },
 ];
 
-// Página de creación y edición de producto
+const inputCls =
+  'w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-700 outline-none focus:border-rosa focus:ring-2 focus:ring-rosa/10 transition-colors bg-white placeholder:text-gray-400';
+
+const labelCls = 'block text-sm font-medium text-gray-600 mb-1.5';
+
 const ProductForm = () => {
   const { id } = useParams<{ id: string }>();
   const esEdicion = !!id;
   const navigate = useNavigate();
 
   const { data: productoExistente, isLoading: cargandoProducto } = useProductById(id || '');
+  const { data: config } = useConfig();
+  const descuentoEfectivo = config?.descuentoEfectivo ?? 0;
 
   const crearProducto = useCreateProduct();
   const actualizarProducto = useUpdateProduct();
@@ -34,12 +41,15 @@ const ProductForm = () => {
 
   const [imagenSeleccionada, setImagenSeleccionada] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [dragging, setDragging] = useState(false);
   const inputImagenRef = useRef<HTMLInputElement>(null);
 
   const {
     register,
     handleSubmit,
     reset,
+    setValue,
+    control,
     formState: { errors },
   } = useForm<ProductoFormData>({
     defaultValues: {
@@ -52,7 +62,9 @@ const ProductForm = () => {
     },
   });
 
-  // Carga los datos del producto cuando se edita
+  // Observa el precio de lista para recalcular precioEfectivo automáticamente
+  const precioLista = useWatch({ control, name: 'precio' });
+
   useEffect(() => {
     if (productoExistente) {
       reset({
@@ -68,11 +80,27 @@ const ProductForm = () => {
     }
   }, [productoExistente, reset]);
 
-  const handleSeleccionarImagen = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const archivo = e.target.files?.[0];
-    if (!archivo) return;
+  // Recalcula precioEfectivo cuando cambia el precio o el % global de descuento
+  useEffect(() => {
+    if (!descuentoEfectivo || !precioLista) return;
+    setValue('precioEfectivo', Math.round(precioLista * (1 - descuentoEfectivo / 100)), { shouldDirty: false });
+  }, [precioLista, descuentoEfectivo, setValue]);
+
+  const aplicarArchivo = (archivo: File) => {
     setImagenSeleccionada(archivo);
     setPreviewUrl(URL.createObjectURL(archivo));
+  };
+
+  const handleSeleccionarImagen = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const archivo = e.target.files?.[0];
+    if (archivo) aplicarArchivo(archivo);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragging(false);
+    const archivo = e.dataTransfer.files?.[0];
+    if (archivo && archivo.type.startsWith('image/')) aplicarArchivo(archivo);
   };
 
   const resetImagen = () => {
@@ -108,54 +136,96 @@ const ProductForm = () => {
   }
 
   const imagenActual = productoExistente?.imagenes[0];
+  const imagenMostrada = previewUrl || imagenActual || null;
 
   return (
-    <div className="max-w-4xl">
+    <div className="max-w-5xl">
 
-      {/* Header */}
-      <div className="flex items-center gap-4 mb-8">
-        <button
-          onClick={() => navigate('/admin/productos')}
-          className="p-2 rounded-lg hover:bg-[#fef0f9] text-gray-400 hover:text-rosa transition-colors"
-        >
-          <ArrowLeft size={20} />
-        </button>
-        <div>
-          <p className="text-xs uppercase tracking-widest text-gray-400 font-medium">Productos</p>
-          <h1 className="text-xl font-bold text-gray-800">
-            {esEdicion ? 'Editar producto' : 'Nuevo producto'}
-          </h1>
+      {/* ── Header ──────────────────────────────────────────────────────── */}
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => navigate('/admin/productos')}
+            className="p-2 rounded-lg text-gray-500 hover:text-rosa hover:bg-rosa-suave transition-colors"
+          >
+            <ArrowLeft size={18} />
+          </button>
+          <div>
+            <h1 className="text-lg font-bold text-marino">
+              {esEdicion ? 'Editar producto' : 'Nuevo Producto'}
+            </h1>
+            <p className="text-xs text-gray-500 mt-0.5">
+              {esEdicion
+                ? 'Modificá los datos del producto.'
+                : 'Agregá un nuevo artículo al catálogo.'}
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => navigate('/admin/productos')}
+            className="px-5 py-2 text-sm font-medium text-gray-500 border border-gray-200 rounded-lg hover:border-gray-300 hover:text-gray-700 transition-colors bg-white"
+          >
+            Cancelar
+          </button>
+          <button
+            form="producto-form"
+            type="submit"
+            disabled={estaCargando}
+            className="flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white rounded-lg transition-colors disabled:opacity-60"
+            style={{ background: '#e91e8c' }}
+          >
+            <Save size={15} />
+            {estaCargando ? 'Guardando...' : 'Guardar Producto'}
+          </button>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="grid grid-cols-3 gap-6">
+      <form id="producto-form" onSubmit={handleSubmit(onSubmit)}>
+        <div className="grid grid-cols-5 gap-5">
 
-          {/* ── Columna izquierda: imagen ──────────────────────────────── */}
-          <div className="col-span-1 space-y-4">
-            <div className="bg-white border border-gray-100 rounded-2xl p-5">
-              <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-4">
-                Imagen
-              </p>
+          {/* ── Columna izquierda (2/5) ──────────────────────────────────── */}
+          <div className="col-span-2 space-y-4">
 
-              {/* Preview o imagen actual */}
-              <div className="aspect-square rounded-xl overflow-hidden bg-gray-50 mb-3 flex items-center justify-center">
-                {previewUrl ? (
-                  <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
-                ) : imagenActual ? (
-                  <img src={imagenActual} alt="Imagen actual" className="w-full h-full object-cover" />
-                ) : (
-                  <div className="flex flex-col items-center gap-2 text-gray-300">
-                    <ImagePlus size={36} strokeWidth={1} />
-                    <span className="text-xs">Sin imagen</span>
-                  </div>
-                )}
+            {/* Card imágenes */}
+            <div className="rounded-xl p-5" style={{ background: '#ffffff', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-sm font-semibold text-gray-700">Imágenes</p>
+                <ImageUp size={16} className="text-gray-400" />
               </div>
 
-              {/* Botón seleccionar imagen */}
-              <label className="flex items-center justify-center gap-2 w-full border border-dashed border-gray-200 rounded-xl py-2.5 text-sm text-gray-400 hover:border-rosa hover:text-rosa cursor-pointer transition-colors">
-                <Upload size={15} />
-                {previewUrl ? 'Cambiar imagen' : 'Subir imagen'}
+              {/* Zona drag & drop */}
+              <div
+                onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+                onDragLeave={() => setDragging(false)}
+                onDrop={handleDrop}
+                onClick={() => inputImagenRef.current?.click()}
+                className={`relative border-2 border-dashed rounded-xl flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors mb-3 ${
+                  dragging ? 'border-rosa bg-rosa-suave' : 'border-gray-200 hover:border-rosa hover:bg-[#fdf5fb]'
+                }`}
+                style={{ minHeight: '200px' }}
+              >
+                {imagenMostrada ? (
+                  <>
+                    <img
+                      src={imagenMostrada}
+                      alt="Preview"
+                      className="w-full h-full object-cover rounded-xl absolute inset-0"
+                    />
+                    <div className="absolute inset-0 bg-black/30 rounded-xl flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                      <p className="text-white text-xs font-medium">Cambiar imagen</p>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center">
+                      <ImageUp size={22} className="text-gray-400" />
+                    </div>
+                    <p className="text-sm font-medium text-gray-500">Arrastrá o seleccioná fotos</p>
+                    <p className="text-xs text-gray-400">Formatos soportados: PNG, JPG (Máx 5MB)</p>
+                  </>
+                )}
                 <input
                   ref={inputImagenRef}
                   type="file"
@@ -163,30 +233,39 @@ const ProductForm = () => {
                   className="hidden"
                   onChange={handleSeleccionarImagen}
                 />
-              </label>
+              </div>
 
-              {/* Nombre del archivo seleccionado */}
-              {imagenSeleccionada && (
-                <div className="flex items-center gap-2 mt-2">
-                  <p className="text-xs text-rosa truncate flex-1">{imagenSeleccionada.name}</p>
-                  <button type="button" onClick={resetImagen} className="text-gray-300 hover:text-red-400">
-                    <X size={13} />
-                  </button>
-                </div>
-              )}
-
-              <p className="text-xs text-gray-300 mt-3 text-center">JPG, PNG o WEBP — máx. 5MB</p>
+              {/* Thumbnails */}
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => inputImagenRef.current?.click()}
+                  className="w-16 h-16 border-2 border-dashed border-gray-200 rounded-lg flex items-center justify-center text-gray-400 hover:border-rosa hover:text-rosa transition-colors text-xl"
+                >
+                  +
+                </button>
+                {imagenMostrada && (
+                  <div className="relative w-16 h-16 rounded-lg overflow-hidden border border-rosa">
+                    <img src={imagenMostrada} alt="thumb" className="w-full h-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={resetImagen}
+                      className="absolute top-0.5 right-0.5 w-4 h-4 bg-black/50 rounded-full flex items-center justify-center"
+                    >
+                      <X size={9} color="white" />
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* Switch activo */}
-            <div className="bg-white border border-gray-100 rounded-2xl p-5">
-              <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-4">
-                Visibilidad
-              </p>
+            {/* Card estado */}
+            <div className="rounded-xl p-5" style={{ background: '#ffffff', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+              <p className="text-sm font-semibold text-gray-700 mb-4">Estado del Producto</p>
               <label className="flex items-center justify-between cursor-pointer">
-                <div>
-                  <p className="text-sm font-medium text-gray-700">Producto activo</p>
-                  <p className="text-xs text-gray-400 mt-0.5">Visible en la tienda</p>
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <Package size={16} className="text-rosa" strokeWidth={1.5} />
+                  Visible en tienda
                 </div>
                 <div className="relative">
                   <input type="checkbox" {...register('activo')} className="sr-only peer" />
@@ -197,47 +276,41 @@ const ProductForm = () => {
             </div>
           </div>
 
-          {/* ── Columna derecha: datos ─────────────────────────────────── */}
-          <div className="col-span-2 space-y-4">
+          {/* ── Columna derecha (3/5) ─────────────────────────────────────── */}
+          <div className="col-span-3 space-y-4">
 
-            {/* Información básica */}
-            <div className="bg-white border border-gray-100 rounded-2xl p-6">
-              <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-5">
-                Información básica
-              </p>
-
+            {/* Información General */}
+            <div className="rounded-xl p-6" style={{ background: '#ffffff', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+              <p className="text-sm font-semibold text-gray-700 mb-5">Información General</p>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Nombre del producto <span className="text-rosa">*</span>
+                  <label className={labelCls}>
+                    Nombre del Producto <span className="text-rosa">*</span>
                   </label>
                   <input
                     {...register('nombre', { required: 'El nombre es obligatorio' })}
                     placeholder="Ej: Taza Stitch Grande"
-                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-rosa transition-colors"
+                    className={inputCls}
                   />
                   {errors.nombre && <p className="text-red-400 text-xs mt-1">{errors.nombre.message}</p>}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label className={labelCls}>
                     Descripción <span className="text-rosa">*</span>
                   </label>
                   <textarea
                     {...register('descripcion', { required: 'La descripción es obligatoria' })}
                     rows={4}
-                    placeholder="Descripción del producto..."
-                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-rosa transition-colors resize-none"
+                    placeholder="Detallá las características, materiales y dimensiones del producto..."
+                    className={`${inputCls} resize-none`}
                   />
                   {errors.descripcion && <p className="text-red-400 text-xs mt-1">{errors.descripcion.message}</p>}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Categoría</label>
-                  <select
-                    {...register('categoria')}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-rosa transition-colors bg-white"
-                  >
+                  <label className={labelCls}>Categoría</label>
+                  <select {...register('categoria')} className={inputCls}>
                     {categorias.map((cat) => (
                       <option key={cat.valor} value={cat.valor}>{cat.label}</option>
                     ))}
@@ -247,84 +320,84 @@ const ProductForm = () => {
             </div>
 
             {/* Precios */}
-            <div className="bg-white border border-gray-100 rounded-2xl p-6">
-              <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-5">
-                Precios
-              </p>
+            <div className="rounded-xl p-6" style={{ background: '#ffffff', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+              <div className="flex items-center gap-2 mb-5">
+                <div className="w-7 h-7 rounded-lg bg-rosa-suave flex items-center justify-center">
+                  <span className="text-rosa text-xs font-bold">$</span>
+                </div>
+                <p className="text-sm font-semibold text-gray-700">Precios</p>
+              </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label className={labelCls}>
                     Precio de lista <span className="text-rosa">*</span>
                   </label>
                   <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 text-sm font-medium">$</span>
                     <input
                       type="number"
+                      step="0.01"
                       {...register('precio', { required: 'Requerido', min: 0, valueAsNumber: true })}
-                      className="w-full border border-gray-200 rounded-xl pl-7 pr-4 py-2.5 text-sm outline-none focus:border-rosa transition-colors"
+                      className={`${inputCls} pl-8`}
+                      placeholder="0.00"
                     />
                   </div>
                   {errors.precio && <p className="text-red-400 text-xs mt-1">{errors.precio.message}</p>}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label className={labelCls}>
                     Precio efectivo <span className="text-rosa">*</span>
                   </label>
                   <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 text-sm font-medium">$</span>
                     <input
                       type="number"
+                      step="0.01"
                       {...register('precioEfectivo', { required: 'Requerido', min: 0, valueAsNumber: true })}
-                      className="w-full border border-gray-200 rounded-xl pl-7 pr-4 py-2.5 text-sm outline-none focus:border-rosa transition-colors"
+                      className={`${inputCls} pl-8`}
+                      placeholder="0.00"
                     />
                   </div>
                   {errors.precioEfectivo && <p className="text-red-400 text-xs mt-1">{errors.precioEfectivo.message}</p>}
+                  {descuentoEfectivo > 0 ? (
+                    <p className="text-xs text-rosa mt-1">
+                      Calculado automáticamente ({descuentoEfectivo}% OFF). Podés editarlo.
+                    </p>
+                  ) : (
+                    <p className="text-xs text-gray-400 mt-1">Precio pagando en efectivo</p>
+                  )}
                 </div>
               </div>
             </div>
 
-            {/* Stock */}
-            <div className="bg-white border border-gray-100 rounded-2xl p-6">
-              <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-5">
-                Stock y mayorista
-              </p>
+            {/* Inventario */}
+            <div className="rounded-xl p-6" style={{ background: '#ffffff', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+              <div className="flex items-center gap-2 mb-5">
+                <div className="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center">
+                  <Package size={14} className="text-blue-400" strokeWidth={1.8} />
+                </div>
+                <p className="text-sm font-semibold text-gray-700">Inventario</p>
+              </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Stock disponible</label>
+                  <label className={labelCls}>Stock Inicial</label>
                   <input
                     type="number"
                     {...register('stock', { valueAsNumber: true, min: 0 })}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-rosa transition-colors"
+                    placeholder="0"
+                    className={inputCls}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Cantidad mínima</label>
+                  <label className={labelCls}>Cantidad mínima mayorista</label>
                   <input
                     type="number"
                     {...register('cantidadMinima', { valueAsNumber: true, min: 1 })}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-rosa transition-colors"
+                    placeholder="6"
+                    className={inputCls}
                   />
                 </div>
               </div>
-            </div>
-
-            {/* Botones */}
-            <div className="flex items-center justify-end gap-3">
-              <button
-                type="button"
-                onClick={() => navigate('/admin/productos')}
-                className="px-6 py-2.5 text-sm font-medium text-gray-500 hover:text-gray-700 border border-gray-200 rounded-xl hover:border-gray-300 transition-colors"
-              >
-                Cancelar
-              </button>
-              <button
-                type="submit"
-                disabled={estaCargando}
-                className="px-8 py-2.5 text-sm font-semibold text-white rounded-xl transition-colors disabled:opacity-60"
-                style={{ background: '#FF77EC' }}
-              >
-                {estaCargando ? 'Guardando...' : esEdicion ? 'Guardar cambios' : 'Crear producto'}
-              </button>
             </div>
 
           </div>

@@ -77,10 +77,7 @@ const CartSidebar = () => {
                   <div className="flex items-center gap-2 mt-2">
                     <button
                       onClick={() =>
-                        actualizarCantidad(
-                          item.producto._id,
-                          Math.max(item.cantidad - 1, item.producto.cantidadMinima)
-                        )
+                        actualizarCantidad(item.producto._id, item.cantidad - 1)
                       }
                       className="w-6 h-6 border border-gray-300 rounded text-sm flex items-center justify-center hover:border-rosa hover:text-rosa"
                     >

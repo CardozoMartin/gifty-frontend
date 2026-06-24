@@ -66,7 +66,7 @@ const Dashboard = () => {
       {/* Encabezado */}
       <div className="flex items-end justify-between">
         <div>
-          <p className="text-xs uppercase tracking-widest text-gray-400 font-medium mb-1">Panel de control</p>
+          <p className="text-xs uppercase tracking-widest text-gray-500 font-medium mb-1">Panel de control</p>
           <h1 className="text-2xl font-bold text-marino">Bienvenida, Gifty 🎁</h1>
         </div>
         <Link
@@ -86,21 +86,22 @@ const Dashboard = () => {
             <Link
               key={t.titulo}
               to={t.link}
-              className={`bg-white border border-gray-100 border-l-4 ${t.borde} p-5 hover:shadow-sm transition-shadow group`}
+              className={`border-l-4 ${t.borde} p-5 transition-shadow group hover:shadow-md`}
+              style={{ background: '#ffffff', boxShadow: '0 1px 3px rgba(0,0,0,0.06)', borderLeftWidth: '4px' }}
             >
               <div className="flex items-start justify-between mb-3">
                 <div className={`p-2 rounded-lg ${t.acento}`}>
                   <Icono size={18} strokeWidth={1.8} />
                 </div>
-                <ArrowRight size={14} className="text-gray-300 group-hover:text-rosa transition-colors mt-1" />
+                <ArrowRight size={14} className="text-gray-400 group-hover:text-rosa transition-colors mt-1" />
               </div>
               {cargando ? (
                 <div className="h-7 w-12 bg-gray-100 rounded animate-pulse mb-1" />
               ) : (
                 <p className="text-3xl font-bold text-marino leading-none mb-1">{t.valor}</p>
               )}
-              <p className="text-xs text-gray-400">{t.titulo}</p>
-              <p className="text-xs text-gray-300 mt-0.5">{t.subtitulo}</p>
+              <p className="text-xs text-gray-500">{t.titulo}</p>
+              <p className="text-xs text-gray-400 mt-0.5">{t.subtitulo}</p>
             </Link>
           );
         })}
@@ -110,8 +111,8 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
         {/* Últimos pedidos */}
-        <div className="bg-white border border-gray-100">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-50">
+        <div style={{ background: '#ffffff', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
             <div className="flex items-center gap-2">
               <ShoppingCart size={16} className="text-rosa" strokeWidth={1.8} />
               <h2 className="text-sm font-semibold text-marino">Últimos pedidos</h2>
@@ -125,16 +126,16 @@ const Dashboard = () => {
             {cargandoPedidos ? (
               <div className="space-y-3">
                 {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="h-9 bg-gray-50 rounded animate-pulse" />
+                  <div key={i} className="h-9 rounded animate-pulse" style={{ background: '#ffffff08' }} />
                 ))}
               </div>
             ) : pedidos && pedidos.length > 0 ? (
-              <ul className="divide-y divide-gray-50">
+              <ul className="divide-y divide-gray-100">
                 {pedidos.slice(0, 5).map((pedido) => (
                   <li key={pedido._id} className="flex items-center justify-between py-2.5">
                     <div className="min-w-0">
                       <span className="text-xs font-bold text-marino">{pedido.numeroPedido}</span>
-                      <span className="text-xs text-gray-400 ml-2 truncate">{pedido.cliente.nombre}</span>
+                      <span className="text-xs text-gray-500 ml-2 truncate">{pedido.cliente.nombre}</span>
                     </div>
                     <span className={`text-xs px-2.5 py-0.5 font-medium shrink-0 ml-3 ${colorEstado(pedido.estado)}`}>
                       {pedido.estado}
@@ -143,7 +144,7 @@ const Dashboard = () => {
                 ))}
               </ul>
             ) : (
-              <div className="flex flex-col items-center py-8 text-gray-300">
+              <div className="flex flex-col items-center py-8 text-gray-400">
                 <ShoppingCart size={32} strokeWidth={1} />
                 <p className="text-sm mt-2">Sin pedidos aún</p>
               </div>
@@ -152,8 +153,8 @@ const Dashboard = () => {
         </div>
 
         {/* Alertas de stock */}
-        <div className="bg-white border border-gray-100">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-50">
+        <div style={{ background: '#ffffff', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
             <div className="flex items-center gap-2">
               <AlertCircle size={16} className="text-orange-400" strokeWidth={1.8} />
               <h2 className="text-sm font-semibold text-marino">Alertas de stock</h2>
@@ -167,11 +168,11 @@ const Dashboard = () => {
             {cargandoProductos ? (
               <div className="space-y-3">
                 {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="h-9 bg-gray-50 rounded animate-pulse" />
+                  <div key={i} className="h-9 rounded animate-pulse" style={{ background: '#ffffff08' }} />
                 ))}
               </div>
             ) : sinStock > 0 ? (
-              <ul className="divide-y divide-gray-50">
+              <ul className="divide-y divide-gray-100">
                 {productos!
                   .filter((p) => p.stock === 0 && p.activo)
                   .slice(0, 5)
@@ -190,7 +191,7 @@ const Dashboard = () => {
             ) : (
               <div className="flex flex-col items-center py-8 text-emerald-400">
                 <CheckCircle2 size={32} strokeWidth={1} />
-                <p className="text-sm mt-2 text-gray-400">Todos los productos tienen stock</p>
+                <p className="text-sm mt-2 text-gray-500">Todos los productos tienen stock</p>
               </div>
             )}
           </div>

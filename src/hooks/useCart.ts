@@ -16,10 +16,8 @@ export const useCart = () => {
   const getTotal = useCartStore((s) => s.getTotal);
   const getCantidadTotal = useCartStore((s) => s.getCantidadTotal);
 
-  // Wrapper que agrega un producto respetando la cantidad mínima mayorista
   const addToCart = (producto: Producto, cantidad: number) => {
-    const cantidadFinal = Math.max(cantidad, producto.cantidadMinima);
-    agregarItem(producto, cantidadFinal);
+    agregarItem(producto, Math.max(cantidad, 1));
   };
 
   return {

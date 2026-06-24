@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Producto } from '../../types/producto';
 import { useCart } from '../../hooks/useCart';
+import { useConfig } from '../../hooks/useConfig';
 
 interface ProductCardProps {
   producto: Producto;
@@ -11,10 +12,13 @@ const formatearPrecio = (precio: number) =>
 
 const ProductCard = ({ producto }: ProductCardProps) => {
   const { addToCart } = useCart();
+  const { data: config } = useConfig();
 
-  const porcentajeDescuento = producto.precioEfectivo < producto.precio
-    ? Math.round(((producto.precio - producto.precioEfectivo) / producto.precio) * 100)
+  const pctEfectivo = config?.descuentoEfectivo ?? 0;
+  const precioEfectivo = pctEfectivo > 0
+    ? Math.round(producto.precio * (1 - pctEfectivo / 100))
     : 0;
+  const tieneDescuento = pctEfectivo > 0;
 
   return (
     <div className="group bg-white overflow-hidden">
@@ -60,21 +64,18 @@ const ProductCard = ({ producto }: ProductCardProps) => {
         </p>
       </div>
 
-      {/* Franja precio efectivo — igual al diseño */}
-      {porcentajeDescuento > 0 && (
+      {/* Franja precio efectivo */}
+      {tieneDescuento ? (
         <button
-          onClick={() => addToCart(producto, producto.cantidadMinima)}
+          onClick={() => addToCart(producto, 1)}
           disabled={producto.stock === 0}
           className="w-full border border-black font-bold text-gray-800 text-xs py-2 px-3 text-center hover:bg-rosa hover:text-white hover:border-rosa transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Efectivo {porcentajeDescuento}% Off: {formatearPrecio(producto.precioEfectivo)}
+          Efectivo {pctEfectivo}% Off: {formatearPrecio(precioEfectivo)}
         </button>
-      )}
-
-      {/* Si no hay descuento, botón simple */}
-      {porcentajeDescuento === 0 && (
+      ) : (
         <button
-          onClick={() => addToCart(producto, producto.cantidadMinima)}
+          onClick={() => addToCart(producto, 1)}
           disabled={producto.stock === 0}
           className="w-full border border-black font-bold text-gray-800 text-xs py-2 px-3 text-center hover:bg-rosa hover:text-white hover:border-rosa transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
         >
