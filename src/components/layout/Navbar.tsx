@@ -32,62 +32,54 @@ const Navbar = () => {
 
   // Estilo del NavLink según si está activo
   const estiloNavLink = ({ isActive }: { isActive: boolean }) =>
-    `text-sm tracking-wide transition-colors duration-200 font-medium ${
+    `text-xs tracking-wide transition-colors duration-200 font-bold ${
       isActive ? 'text-rosa' : 'text-marino hover:text-rosa'
     }`;
 
   return (
     <nav className="bg-white border-b border-gray-100 sticky top-0 z-50">
       <div className="w-full px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
+        <div className="flex items-center justify-between h-16 md:h-20">
 
-          {/* ── Logo — izquierda ──────────────────────────────────────── */}
-          <Link to="/" className="flex items-center shrink-0">
+          {/* ── Hamburguesa — solo mobile, izquierda ──────────────────── */}
+          <button
+            className="md:hidden text-marino hover:text-rosa p-1"
+            onClick={() => setMenuAbierto(!menuAbierto)}
+            aria-label="Menú"
+          >
+            {menuAbierto ? <X size={22} strokeWidth={1.5} /> : <Menu size={22} strokeWidth={1.5} />}
+          </button>
+
+          {/* ── Logo — centrado en mobile, izquierda en desktop ───────── */}
+          <Link to="/" className="absolute left-1/2 -translate-x-1/2 md:static md:translate-x-0 flex items-center shrink-0">
             <img
               src={logoGifty}
               alt="Gifty"
-              className="h-14 w-auto object-contain"
+              className="h-16 md:h-20 w-auto object-contain"
             />
           </Link>
 
-          {/* ── Lado derecho: links + íconos ──────────────────────────── */}
-          <div className="flex items-center gap-9">
-          {/* ── Links de navegación — desktop ─────────────────────────── */}
-          <div className="hidden md:flex items-center space-x-9">
-            <NavLink to="/" className={estiloNavLink} end>
-              Inicio
-            </NavLink>
+          {/* ── Links de navegación — solo desktop ────────────────────── */}
+          <div className="hidden md:flex items-center space-x-5 ml-auto mr-4">
+            <NavLink to="/" className={estiloNavLink} end>Inicio</NavLink>
 
-            {/* Dropdown Tienda */}
             <div
               className="relative"
               onMouseEnter={() => setDropdownAbierto(true)}
               onMouseLeave={() => setDropdownAbierto(false)}
             >
-              <button className="flex items-center gap-1 text-sm font-medium text-marino hover:text-rosa transition-colors tracking-wide">
+              <button className="flex items-center gap-1 text-xs font-bold text-marino hover:text-rosa transition-colors tracking-wide">
                 Tienda
-                <ChevronDown
-                  size={15}
-                  className={`transition-transform duration-200 ${dropdownAbierto ? 'rotate-180' : ''}`}
-                />
+                <ChevronDown size={15} className={`transition-transform duration-200 ${dropdownAbierto ? 'rotate-180' : ''}`} />
               </button>
-
-              {/* Panel desplegable de categorías */}
               {dropdownAbierto && (
                 <div className="absolute top-full left-1/2 -translate-x-1/2 mt-0 bg-white shadow-lg border border-gray-100 rounded-b-md py-2 min-w-44 z-50">
-                  <Link
-                    to="/tienda"
-                    className="block px-5 py-2 text-sm text-marino hover:text-rosa hover:bg-gray-50 transition-colors"
-                  >
+                  <Link to="/tienda" className="block px-5 py-2 text-sm text-marino hover:text-rosa hover:bg-gray-50 transition-colors">
                     Todos los productos
                   </Link>
                   <div className="border-t border-gray-100 my-1" />
                   {categorias.map((cat) => (
-                    <Link
-                      key={cat.slug}
-                      to={`/tienda?categoria=${cat.slug}`}
-                      className="block px-5 py-2 text-sm text-marino hover:text-rosa hover:bg-gray-50 transition-colors"
-                    >
+                    <Link key={cat.slug} to={`/tienda?categoria=${cat.slug}`} className="block px-5 py-2 text-sm text-marino hover:text-rosa hover:bg-gray-50 transition-colors">
                       {cat.nombre}
                     </Link>
                   ))}
@@ -95,19 +87,12 @@ const Navbar = () => {
               )}
             </div>
 
-            <NavLink to="/como-comprar" className={estiloNavLink}>
-              Cómo comprar
-            </NavLink>
-
-            <NavLink to="/cuenta-mayorista" className={estiloNavLink}>
-              Cuenta Mayorista
-            </NavLink>
+            <NavLink to="/como-comprar" className={estiloNavLink}>Cómo comprar</NavLink>
+            <NavLink to="/cuenta-mayorista" className={estiloNavLink}>Ingreso / Registro</NavLink>
           </div>
 
           {/* ── Íconos derecha ────────────────────────────────────────── */}
-          <div className="flex items-center space-x-4">
-
-            {/* Buscador */}
+          <div className="flex items-center space-x-3">
             {busquedaVisible ? (
               <form
                 className="flex items-center gap-1"
@@ -124,36 +109,19 @@ const Navbar = () => {
                   placeholder="Buscar..."
                   value={textoBusqueda}
                   onChange={(e) => setTextoBusqueda(e.target.value)}
-                  className="border-b border-marino outline-none text-sm px-1 py-0.5 w-36 bg-transparent text-marino placeholder-gray-400"
+                  className="border-b border-marino outline-none text-sm px-1 py-0.5 w-28 md:w-36 bg-transparent text-marino placeholder-gray-400"
                 />
-                <button
-                  type="button"
-                  onClick={() => {
-                    setBusquedaVisible(false);
-                    setTextoBusqueda('');
-                  }}
-                  className="text-gray-400 hover:text-rosa transition-colors ml-1"
-                >
+                <button type="button" onClick={() => { setBusquedaVisible(false); setTextoBusqueda(''); }} className="text-gray-400 hover:text-rosa transition-colors ml-1">
                   <X size={15} />
                 </button>
               </form>
             ) : (
-              <button
-                onClick={() => setBusquedaVisible(true)}
-                className="text-marino hover:text-rosa transition-colors p-1"
-                aria-label="Buscar"
-              >
-                {/* Ícono lupa outline igual al del navbar original */}
+              <button onClick={() => setBusquedaVisible(true)} className="text-marino hover:text-rosa transition-colors p-1" aria-label="Buscar">
                 <Search size={20} strokeWidth={1.5} />
               </button>
             )}
 
-            {/* Carrito con contador */}
-            <button
-              onClick={abrirCarrito}
-              className="relative text-marino hover:text-rosa transition-colors p-1"
-              aria-label="Carrito de compras"
-            >
+            <button onClick={abrirCarrito} className="relative text-marino hover:text-rosa transition-colors p-1" aria-label="Carrito de compras">
               <ShoppingBag size={20} strokeWidth={1.5} />
               {cantidadTotal > 0 && (
                 <span className="absolute -top-1 -right-1 bg-rosa text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-bold leading-none">
@@ -161,17 +129,8 @@ const Navbar = () => {
                 </span>
               )}
             </button>
-
-            {/* Hamburguesa móvil */}
-            <button
-              className="md:hidden text-marino hover:text-rosa p-1"
-              onClick={() => setMenuAbierto(!menuAbierto)}
-              aria-label="Menú"
-            >
-              {menuAbierto ? <X size={22} strokeWidth={1.5} /> : <Menu size={22} strokeWidth={1.5} />}
-            </button>
           </div>
-          </div>{/* fin lado derecho */}
+
         </div>
       </div>
 
@@ -220,7 +179,7 @@ const Navbar = () => {
             className={estiloNavLink}
             onClick={() => setMenuAbierto(false)}
           >
-            Cuenta Mayorista
+            Ingreso / Registro
           </NavLink>
         </div>
       )}

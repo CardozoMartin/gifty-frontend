@@ -1,11 +1,12 @@
 import { NavLink, Outlet, Link, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Package, ShoppingCart, ArrowLeft, LogOut, Gift, Settings } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingCart, ArrowLeft, LogOut, Gift, Settings, Tag } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 
 const navItems = [
   { to: '/admin', label: 'Dashboard', icono: LayoutDashboard, end: true },
   { to: '/admin/productos', label: 'Productos', icono: Package, end: false },
   { to: '/admin/pedidos', label: 'Pedidos', icono: ShoppingCart, end: false },
+  { to: '/admin/cupones', label: 'Cupones', icono: Tag, end: false },
   { to: '/admin/configuracion', label: 'Configuración', icono: Settings, end: false },
 ];
 

@@ -5,6 +5,15 @@ export interface Descuento {
   porcentaje: number;
 }
 
+export interface EmailNotificaciones {
+  pedidoRecibido: boolean;
+  pedidoConfirmado: boolean;
+  pedidoEnPreparacion: boolean;
+  pedidoEnviado: boolean;
+  pedidoEntregado: boolean;
+  pedidoCancelado: boolean;
+}
+
 export interface ConfigData {
   _id: string;
   metodosPago: string[];
@@ -13,6 +22,7 @@ export interface ConfigData {
   compraMinima: number;
   descuentos: Descuento[];
   descuentoEfectivo: number;
+  emailNotificaciones: EmailNotificaciones;
 }
 
 export const getConfig = async (): Promise<ConfigData> => {

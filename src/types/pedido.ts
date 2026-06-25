@@ -19,12 +19,15 @@ export interface ItemPedido {
 // Datos del cliente al hacer el pedido
 export interface DatosCliente {
   nombre: string;
+  apellido?: string;
   email: string;
   telefono: string;
+  dni?: string;
   empresa?: string;
   direccion: string;
   ciudad: string;
   provincia: string;
+  codigoPostal?: string;
 }
 
 // Pedido completo tal como llega desde la API
@@ -36,6 +39,7 @@ export interface Pedido {
   total: number;
   estado: EstadoPedido;
   metodoPago?: string;
+  medioEnvio?: string;
   notas?: string;
   createdAt: string;
   updatedAt: string;
@@ -46,5 +50,7 @@ export interface CrearPedidoInput {
   cliente: DatosCliente;
   items: ItemPedido[];
   metodoPago?: string;
+  medioEnvio?: string;
   notas?: string;
+  cuponCodigo?: string;
 }

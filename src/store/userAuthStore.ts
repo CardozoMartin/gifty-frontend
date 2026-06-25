@@ -4,8 +4,16 @@ import { persist } from 'zustand/middleware';
 export interface Usuario {
   _id: string;
   nombre: string;
+  apellido?: string;
   email: string;
   verificado: boolean;
+  empresa?: string;
+  telefono?: string;
+  dni?: string;
+  direccion?: string;
+  ciudad?: string;
+  provincia?: string;
+  codigoPostal?: string;
 }
 
 interface UserAuthStore {

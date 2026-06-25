@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Gift } from 'lucide-react';
+import TopBanner from '../components/layout/TopBanner';
 import CategoryGrid from '../components/shop/CategoryGrid';
 import ProductCard from '../components/shop/ProductCard';
 import { useProducts } from '../hooks/useProducts';
@@ -12,6 +13,8 @@ const Home = () => {
 
   return (
     <main>
+      <TopBanner />
+
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <section className="relative overflow-hidden h-[60vh] sm:h-[75vh] lg:h-[82vh]">
         {/* Imagen de fondo de la tienda — ocupa todo el hero */}
@@ -93,12 +96,54 @@ const Home = () => {
         {/* Botón para ver toda la tienda */}
         {productos && productos.length > 0 && (
           <div className="text-center mt-10">
-            <Link to="/tienda" className="btn-secundario">
-              Ver todos los productos
+            <Link
+              to="/tienda"
+              className="group relative overflow-hidden inline-flex items-center justify-center text-white font-semibold px-10 py-3 uppercase tracking-widest text-xs shadow-md border border-white hover:border-transparent transition-all duration-300"
+              style={{ backgroundColor: '#FF77EC' }}
+            >
+              <span className="relative z-10">Ver todos los productos</span>
+              <span className="absolute z-0 translate-x-0 opacity-0 group-hover:translate-x-28 group-hover:opacity-100 transition-all duration-500 ease-out flex items-center">
+                <Gift strokeWidth={1.5} style={{ width: '1.1rem', height: '1.1rem' }} />
+              </span>
             </Link>
           </div>
         )}
       </section>
+      {/* ── Newsletter ───────────────────────────────────────────────────── */}
+      <div className="relative flex justify-center px-4 py-10 overflow-hidden">
+        <img src={heroImg} alt="" className="absolute inset-0 w-full h-full object-cover object-center" aria-hidden="true" />
+        <div className="relative z-10 w-full max-w-2xl rounded-lg px-6 py-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4" style={{ background: '#FFD3DB' }}>
+          <div className="md:w-1/2">
+            <h3 className="text-xl font-semibold italic text-rosa mb-2">¡Mantente informado!</h3>
+            <p className="text-marino text-sm">
+              Sé el primero en enterarte sobre todas nuestras promociones exclusivas, ofertas y novedades.
+            </p>
+          </div>
+          <form className="flex flex-col gap-2 w-full md:w-1/2">
+            <input
+              type="text"
+              placeholder="Nombre"
+              className="w-full px-2.5 py-1 rounded text-gray-800 text-xs outline-none bg-white border border-pink-100 placeholder-gray-400"
+            />
+            <input
+              type="email"
+              placeholder="Correo electrónico"
+              className="w-full px-2.5 py-1 rounded text-gray-800 text-xs outline-none bg-white border border-pink-100 placeholder-gray-400"
+            />
+            <button
+              type="submit"
+              className="group relative overflow-hidden w-full flex items-center justify-center text-white font-semibold py-1.5 uppercase tracking-widest text-xs border border-white hover:border-transparent transition-all duration-300"
+              style={{ backgroundColor: '#FF77EC' }}
+            >
+              <span className="relative z-10">Suscribirse</span>
+              <span className="absolute z-0 translate-x-0 opacity-0 group-hover:translate-x-16 group-hover:opacity-100 transition-all duration-500 ease-out flex items-center">
+                <Gift strokeWidth={1.5} style={{ width: '1rem', height: '1rem' }} />
+              </span>
+            </button>
+          </form>
+        </div>
+      </div>
+
     </main>
   );
 };

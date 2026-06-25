@@ -1,9 +1,10 @@
 import { useState, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ChevronLeft, Gift } from 'lucide-react';
-import { useProductBySlug } from '../hooks/useProducts';
+import { useProductBySlug, useProducts } from '../hooks/useProducts';
 import { useCart } from '../hooks/useCart';
 import { useConfig } from '../hooks/useConfig';
+import ProductCard from '../components/shop/ProductCard';
 
 
 // Acordeón con transición suave de altura
@@ -52,6 +53,7 @@ const ProductDetail = () => {
   const { data: config } = useConfig();
 
   // Índice de la imagen principal mostrada
+  const { data: relacionados } = useProducts(producto?.categoria);
   const [imagenActiva, setImagenActiva] = useState(0);
   const [posZoom, setPosZoom] = useState({ x: 50, y: 50 });
   const [zoomActivo, setZoomActivo] = useState(false);
@@ -106,7 +108,7 @@ const ProductDetail = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Breadcrumb */}
       <Link
         to="/tienda"
@@ -118,7 +120,7 @@ const ProductDetail = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
         {/* ── Galería de imágenes ──────────────────────────────────────── */}
-        <div>
+        <div className="max-w-xs mx-auto md:max-w-none">
           {/* Imagen principal con zoom inline al hover — solo desktop */}
           <div
             ref={imagenRef}
@@ -196,18 +198,23 @@ const ProductDetail = () => {
 
           {/* Precio con descuento efectivo */}
           {porcentajeDescuento > 0 && (
-            <p className="text-sm text-gray-500 mb-4">
-              <span className="bg-rosa text-white text-xs font-bold px-2 py-0.5 rounded mr-2">
-                Efectivo {porcentajeDescuento}% OFF
+            <p className="text-sm text-gray-600 mb-4">
+              <span className="border border-black text-gray-800 text-xs font-bold px-2 py-0.5 mr-2">
+                Efectivo {porcentajeDescuento}% Off:
               </span>
-              {formatearPrecio(precioEfectivo)}
+              <strong>{formatearPrecio(precioEfectivo)}</strong>
             </p>
           )}
 
           {/* Stock */}
-          <p className={`text-sm font-semibold mb-4 ${producto.stock > 0 ? 'text-green-600' : 'text-red-500'}`}>
-            {producto.stock > 0 ? 'Hay existencias' : 'Sin stock'}
-          </p>
+          {producto.stock > 0 && producto.stock <= 10 && (
+            <p className="text-sm font-bold text-rosa mb-4">
+              Solo quedan {producto.stock} disponibles
+            </p>
+          )}
+          {producto.stock === 0 && (
+            <p className="text-sm font-bold text-red-500 mb-4">Sin stock</p>
+          )}
 
           {/* Descripción */}
           <p className="text-gray-600 text-sm leading-relaxed mb-6">
@@ -256,6 +263,23 @@ const ProductDetail = () => {
         </div>
       </div>
 
+      {/* Productos relacionados */}
+      {relacionados && relacionados.filter(p => p._id !== producto._id).length > 0 && (
+        <>
+          <div className="w-full h-px mt-12 mb-8" style={{ background: '#FF77EC', opacity: 0.4 }} />
+          <section>
+            <h2 className="text-lg font-bold text-marino mb-6">Productos relacionados</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+              {relacionados
+                .filter(p => p._id !== producto._id)
+                .slice(0, 5)
+                .map(p => (
+                  <ProductCard key={p._id} producto={p} />
+                ))}
+            </div>
+          </section>
+        </>
+      )}
 
     </div>
   );

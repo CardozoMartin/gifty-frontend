@@ -69,7 +69,7 @@ const ProductCard = ({ producto }: ProductCardProps) => {
         <button
           onClick={() => addToCart(producto, 1)}
           disabled={producto.stock === 0}
-          className="w-full border border-black font-bold text-gray-800 text-xs py-2 px-3 text-center hover:bg-rosa hover:text-white hover:border-rosa transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full border border-black font-black text-gray-800 text-[10px] py-1 px-3 text-center disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Efectivo {pctEfectivo}% Off: {formatearPrecio(precioEfectivo)}
         </button>
@@ -77,7 +77,7 @@ const ProductCard = ({ producto }: ProductCardProps) => {
         <button
           onClick={() => addToCart(producto, 1)}
           disabled={producto.stock === 0}
-          className="w-full border border-black font-bold text-gray-800 text-xs py-2 px-3 text-center hover:bg-rosa hover:text-white hover:border-rosa transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full border border-black font-black text-gray-800 text-[10px] py-1 px-3 text-center disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Agregar al carrito
         </button>

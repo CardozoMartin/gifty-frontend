@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useOrders, useUpdateOrderStatus } from '../../hooks/useOrders';
-import { Pedido, EstadoPedido } from '../../types/pedido';
+import { EstadoPedido } from '../../types/pedido';
 
 // Formatea precio en pesos argentinos
 const formatearPrecio = (precio: number) =>
@@ -40,7 +40,7 @@ const estadosDisponibles: EstadoPedido[] = [
 // Página de gestión de pedidos en el panel admin
 const AdminOrders = () => {
   const [filtroEstado, setFiltroEstado] = useState<EstadoPedido | undefined>(undefined);
-  const [pedidoDetalle, setPedidoDetalle] = useState<Pedido | null>(null);
+  const navigate = useNavigate();
 
   const { data: pedidos, isLoading } = useOrders(filtroEstado);
   const actualizarEstado = useUpdateOrderStatus();
@@ -48,10 +48,6 @@ const AdminOrders = () => {
   // Cambia el estado de un pedido desde el select de la tabla
   const handleCambiarEstado = async (id: string, nuevoEstado: EstadoPedido) => {
     await actualizarEstado.mutateAsync({ id, estado: nuevoEstado });
-    // Si el pedido está abierto en detalle, actualizamos el estado local
-    if (pedidoDetalle?._id === id) {
-      setPedidoDetalle((prev) => prev ? { ...prev, estado: nuevoEstado } : null);
-    }
   };
 
   return (
@@ -130,7 +126,7 @@ const AdminOrders = () => {
                     </td>
                     <td className="px-4 py-3 text-center">
                       <button
-                        onClick={() => setPedidoDetalle(pedido)}
+                        onClick={() => navigate(`/admin/pedidos/${pedido._id}`)}
                         className="text-xs text-rosa hover:underline"
                       >
                         Ver detalle
@@ -149,98 +145,6 @@ const AdminOrders = () => {
             )}
           </div>
         </div>
-      )}
-
-      {/* ── Modal de detalle del pedido ──────────────────────────────────── */}
-      {pedidoDetalle && (
-        <>
-          <div
-            className="fixed inset-0 bg-black/50 z-40"
-            onClick={() => setPedidoDetalle(null)}
-          />
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl">
-              {/* Header del modal */}
-              <div className="flex items-center justify-between p-6 border-b border-gray-100">
-                <div>
-                  <h2 className="text-lg font-bold text-marino font-mono">
-                    {pedidoDetalle.numeroPedido}
-                  </h2>
-                  <p className="text-xs text-gray-400">{formatearFecha(pedidoDetalle.createdAt)}</p>
-                </div>
-                <button
-                  onClick={() => setPedidoDetalle(null)}
-                  className="text-gray-400 hover:text-rosa"
-                >
-                  <X size={20} />
-                </button>
-              </div>
-
-              <div className="p-6 space-y-5">
-                {/* Datos del cliente */}
-                <div>
-                  <h3 className="text-sm font-semibold text-marino mb-2">Datos del cliente</h3>
-                  <div className="bg-gray-50 rounded-lg p-3 text-sm space-y-1">
-                    <p><span className="text-gray-500">Nombre:</span> {pedidoDetalle.cliente.nombre}</p>
-                    <p><span className="text-gray-500">Email:</span> {pedidoDetalle.cliente.email}</p>
-                    <p><span className="text-gray-500">Teléfono:</span> {pedidoDetalle.cliente.telefono}</p>
-                    {pedidoDetalle.cliente.empresa && (
-                      <p><span className="text-gray-500">Empresa:</span> {pedidoDetalle.cliente.empresa}</p>
-                    )}
-                    <p>
-                      <span className="text-gray-500">Dirección:</span>{' '}
-                      {pedidoDetalle.cliente.direccion}, {pedidoDetalle.cliente.ciudad},{' '}
-                      {pedidoDetalle.cliente.provincia}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Ítems del pedido */}
-                <div>
-                  <h3 className="text-sm font-semibold text-marino mb-2">Productos</h3>
-                  <ul className="space-y-2">
-                    {pedidoDetalle.items.map((item, i) => (
-                      <li key={i} className="flex items-center gap-3 text-sm">
-                        <img
-                          src={item.imagen || '/placeholder.jpg'}
-                          alt={item.nombre}
-                          className="w-10 h-10 object-cover rounded border border-gray-100 shrink-0"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-marino truncate">{item.nombre}</p>
-                          <p className="text-gray-400 text-xs">
-                            {item.cantidad} × {formatearPrecio(item.precio)}
-                          </p>
-                        </div>
-                        <p className="font-semibold text-rosa shrink-0">
-                          {formatearPrecio(item.precio * item.cantidad)}
-                        </p>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Total */}
-                <div className="flex justify-between items-center border-t border-gray-100 pt-3">
-                  <span className="font-bold text-marino">Total</span>
-                  <span className="text-xl font-bold text-rosa">
-                    {formatearPrecio(pedidoDetalle.total)}
-                  </span>
-                </div>
-
-                {/* Notas */}
-                {pedidoDetalle.notas && (
-                  <div>
-                    <h3 className="text-sm font-semibold text-marino mb-1">Notas</h3>
-                    <p className="text-sm text-gray-600 bg-gray-50 rounded p-3">
-                      {pedidoDetalle.notas}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </>
       )}
     </div>
   );

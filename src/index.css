@@ -3,6 +3,16 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Animación: logo footer gira desde invertido a posición normal */
+@keyframes flipIn {
+  0%   { transform: rotate(180deg); opacity: 0; }
+  50%  { transform: rotate(180deg); opacity: 1; }
+  100% { transform: rotate(0deg);   opacity: 1; }
+}
+.animate-flip-in {
+  animation: flipIn 1.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
 /* Animación: sube desde abajo con fade in */
 @keyframes slideUp {
   from {

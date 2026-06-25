@@ -37,7 +37,9 @@ import Dashboard from './pages/admin/Dashboard';
 import AdminProducts from './pages/admin/Products';
 import ProductForm from './pages/admin/ProductForm';
 import AdminOrders from './pages/admin/Orders';
+import OrderDetail from './pages/admin/OrderDetail';
 import AdminConfig from './pages/admin/Config';
+import Cupones from './pages/admin/Cupones';
 
 // Configuración de TanStack Query
 const queryClient = new QueryClient({
@@ -53,7 +55,6 @@ const queryClient = new QueryClient({
 const ShopLayout = ({ children }: { children: React.ReactNode }) => (
   <>
     <Navbar />
-    <TopBanner />
     {children}
     <Footer />
     <CartSidebar />
@@ -115,6 +116,8 @@ const App = () => {
               <Route path="productos/nuevo" element={<ProductForm />} />
               <Route path="productos/:id/editar" element={<ProductForm />} />
               <Route path="pedidos" element={<AdminOrders />} />
+              <Route path="pedidos/:id" element={<OrderDetail />} />
+              <Route path="cupones" element={<Cupones />} />
               <Route path="configuracion" element={<AdminConfig />} />
             </Route>
           </Route>

@@ -20,9 +20,31 @@ export interface AuthResponse {
   usuario: Usuario;
 }
 
+export interface PerfilData {
+  nombre: string;
+  apellido?: string;
+  empresa?: string;
+  telefono?: string;
+  dni?: string;
+  direccion?: string;
+  ciudad?: string;
+  provincia?: string;
+  codigoPostal?: string;
+}
+
 export const userAuthService = {
   login: async (datos: LoginData): Promise<AuthResponse> => {
     const res = await api.post('/usuarios/login', datos);
+    return res.data;
+  },
+
+  getPerfil: async (): Promise<{ ok: boolean; usuario: import('../store/userAuthStore').Usuario }> => {
+    const res = await api.get('/usuarios/perfil');
+    return res.data;
+  },
+
+  updatePerfil: async (datos: PerfilData): Promise<{ ok: boolean; usuario: import('../store/userAuthStore').Usuario }> => {
+    const res = await api.put('/usuarios/perfil', datos);
     return res.data;
   },
 

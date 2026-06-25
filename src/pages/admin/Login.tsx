@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Lock, Eye, EyeOff } from 'lucide-react';
 import { loginAdmin } from '../../services/authService';
 import { useAuthStore } from '../../store/authStore';
+import logoGifty from '../../img/logo-gifty.png';
 
 interface LoginFormData {
   usuario: string;
@@ -44,13 +45,11 @@ const AdminLogin = () => {
 
         {/* Logo y título */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-marino rounded-2xl mb-4 shadow-lg">
-            <Lock size={28} className="text-white" />
-          </div>
-          <h1 className="text-2xl font-bold text-marino">
-            Gifty <span className="text-rosa">Mayorista</span>
-          </h1>
-          <p className="text-gray-500 text-sm mt-1">Panel de administración</p>
+          <img src={logoGifty} alt="Gifty" className="h-20 w-auto object-contain mx-auto mb-2" />
+          <p className="text-gray-500 text-sm flex items-center justify-center gap-1.5">
+            <Lock size={13} className="text-gray-400" />
+            Panel de administración
+          </p>
         </div>
 
         {/* Card del formulario */}

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Plus, X, Save, CreditCard, Truck, AlertCircle, ShoppingCart, Tag, Banknote } from 'lucide-react';
+import { Plus, X, Save, CreditCard, Truck, AlertCircle, ShoppingCart, Tag, Banknote, Mail, Inbox, CheckCircle, Package, Send, PartyPopper, XCircle } from 'lucide-react';
 import { useConfig, useUpdateConfig } from '../../hooks/useConfig';
-import { Descuento } from '../../services/configService';
+import { Descuento, EmailNotificaciones } from '../../services/configService';
 
 // ── Editor de lista (métodos de pago / medios de envío) ───────────────────────
 const ListaEditor = ({
@@ -309,6 +309,14 @@ const AdminConfig = () => {
   const [compraMinima, setCompraMinima]             = useState(0);
   const [descuentos, setDescuentos]                 = useState<Descuento[]>([]);
   const [descuentoEfectivo, setDescuentoEfectivo]   = useState(0);
+  const [emailNotificaciones, setEmailNotificaciones] = useState<EmailNotificaciones>({
+    pedidoRecibido: true,
+    pedidoConfirmado: true,
+    pedidoEnPreparacion: true,
+    pedidoEnviado: true,
+    pedidoEntregado: true,
+    pedidoCancelado: true,
+  });
   const [guardado, setGuardado]                     = useState(false);
 
   useEffect(() => {
@@ -319,11 +327,17 @@ const AdminConfig = () => {
       setCompraMinima(config.compraMinima ?? 0);
       setDescuentos(config.descuentos ?? []);
       setDescuentoEfectivo(config.descuentoEfectivo ?? 0);
+      if (config.emailNotificaciones) {
+        setEmailNotificaciones(config.emailNotificaciones);
+      }
     }
   }, [config]);
 
+  const toggleEmail = (clave: keyof EmailNotificaciones) =>
+    setEmailNotificaciones((prev) => ({ ...prev, [clave]: !prev[clave] }));
+
   const handleGuardar = async () => {
-    await updateConfig.mutateAsync({ metodosPago, mediosEnvio, notaEnvio, compraMinima, descuentos, descuentoEfectivo });
+    await updateConfig.mutateAsync({ metodosPago, mediosEnvio, notaEnvio, compraMinima, descuentos, descuentoEfectivo, emailNotificaciones });
     setGuardado(true);
     setTimeout(() => setGuardado(false), 2500);
   };
@@ -398,6 +412,53 @@ const AdminConfig = () => {
             placeholder="Ej: EL COSTO DEL ENVÍO SE CALCULARÁ ANTES DE FINALIZAR LA COMPRA..."
             className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-rosa transition-colors resize-none"
           />
+        </div>
+
+        {/* Notificaciones por email */}
+        <div className="bg-white border border-gray-100 rounded-2xl p-6">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-8 h-8 rounded-lg bg-[#fce7f3] flex items-center justify-center">
+              <Mail size={16} className="text-rosa" strokeWidth={1.8} />
+            </div>
+            <h2 className="text-sm font-semibold text-gray-800">Notificaciones por email al cliente</h2>
+          </div>
+          <p className="text-xs text-gray-400 mb-5">Activá o desactivá cada email que se envía automáticamente al cliente.</p>
+
+          <div className="space-y-3">
+            {(
+              [
+                { clave: 'pedidoRecibido',      Icono: Inbox,       color: '#f59e0b', bg: '#fef3c7', label: 'Pedido recibido',   desc: 'Al crear el pedido' },
+                { clave: 'pedidoConfirmado',    Icono: CheckCircle, color: '#3b82f6', bg: '#eff6ff', label: 'Pedido confirmado',  desc: 'Al confirmar el pago' },
+                { clave: 'pedidoEnPreparacion', Icono: Package,     color: '#8b5cf6', bg: '#f5f3ff', label: 'En preparación',     desc: 'Al comenzar a armar el pedido' },
+                { clave: 'pedidoEnviado',       Icono: Send,        color: '#6366f1', bg: '#eef2ff', label: 'Pedido enviado',     desc: 'Al despachar el pedido' },
+                { clave: 'pedidoEntregado',     Icono: PartyPopper, color: '#10b981', bg: '#ecfdf5', label: 'Pedido entregado',   desc: 'Al marcar como entregado' },
+                { clave: 'pedidoCancelado',     Icono: XCircle,     color: '#ef4444', bg: '#fef2f2', label: 'Pedido cancelado',   desc: 'Al cancelar el pedido' },
+              ] as const
+            ).map(({ clave, Icono, color, bg, label, desc }) => (
+              <label key={clave} className="flex items-center justify-between cursor-pointer group">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: bg }}>
+                    <Icono size={15} style={{ color }} strokeWidth={1.8} />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-700">{label}</p>
+                    <p className="text-xs text-gray-400">{desc}</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => toggleEmail(clave)}
+                  className={`relative w-11 h-6 rounded-full transition-colors ${
+                    emailNotificaciones[clave] ? 'bg-rosa' : 'bg-gray-200'
+                  }`}
+                >
+                  <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${
+                    emailNotificaciones[clave] ? 'translate-x-5' : 'translate-x-0'
+                  }`} />
+                </button>
+              </label>
+            ))}
+          </div>
         </div>
 
       </div>
