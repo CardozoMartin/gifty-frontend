@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { ShoppingBag, Search, Menu, X, ChevronDown } from 'lucide-react';
 import { useCart } from '../../hooks/useCart';
+import { useUserAuthStore } from '../../store/userAuthStore';
 import logoGifty from '../../img/logo-gifty.png';
 
 // Categorías del dropdown "Tienda"
@@ -22,6 +23,7 @@ const Navbar = () => {
   const inputBusquedaRef = useRef<HTMLInputElement>(null);
 
   const { cantidadTotal, abrirCarrito } = useCart();
+  const { estaAutenticado } = useUserAuthStore();
 
   // Foco automático al abrir el campo de búsqueda
   useEffect(() => {
@@ -88,7 +90,9 @@ const Navbar = () => {
             </div>
 
             <NavLink to="/como-comprar" className={estiloNavLink}>Cómo comprar</NavLink>
-            <NavLink to="/cuenta-mayorista" className={estiloNavLink}>Ingreso / Registro</NavLink>
+            <NavLink to={estaAutenticado ? '/mi-cuenta' : '/cuenta-mayorista'} className={estiloNavLink}>
+              {estaAutenticado ? 'Mi Cuenta' : 'Ingreso / Registro'}
+            </NavLink>
           </div>
 
           {/* ── Íconos derecha ────────────────────────────────────────── */}

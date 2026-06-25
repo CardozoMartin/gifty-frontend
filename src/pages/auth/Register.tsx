@@ -36,9 +36,9 @@ const Register = () => {
             <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-4">
               <CheckCircle2 size={32} className="text-emerald-500" strokeWidth={1.5} />
             </div>
-            <h2 className="text-xl font-bold text-marino mb-2">¡Revisá tu email!</h2>
+            <h2 className="text-xl font-bold text-marino mb-2">¡Cuenta creada!</h2>
             <p className="text-sm text-gray-500 mb-6">
-              Te enviamos un link de verificación. Hacé click en el link para activar tu cuenta.
+              Tu cuenta mayorista está activa. Ya podés iniciar sesión.
             </p>
             <Link
               to="/login"
