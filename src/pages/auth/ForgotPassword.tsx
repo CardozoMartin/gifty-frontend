@@ -35,7 +35,7 @@ const ForgotPassword = () => {
             <Gift size={24} color="white" strokeWidth={2} />
           </div>
           <h1 className="text-2xl font-bold text-marino">Recuperar contraseña</h1>
-          <p className="text-sm text-gray-500 mt-1">Te enviamos un link para resetearla</p>
+          <p className="text-sm text-gray-500 mt-1">Comunicate con nosotros para recuperar tu acceso</p>
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
