@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
-import { Plus, Pencil, Trash2, X, Loader2, CheckCircle2, AlertCircle, Tag, ToggleLeft, ToggleRight } from 'lucide-react';
+import { Plus, Pencil, Trash2, X, Loader2, AlertCircle, Tag, ToggleLeft, ToggleRight } from 'lucide-react';
 import { cuponService, Cupon, CuponInput } from '../../services/cuponService';
 
 const inputCls = 'w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-rosa/20 focus:border-rosa transition-colors';
