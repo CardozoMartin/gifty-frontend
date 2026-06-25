@@ -29,6 +29,7 @@ import MiCuenta from './pages/MiCuenta';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import ForgotPassword from './pages/auth/ForgotPassword';
+import ResetPassword from './pages/auth/ResetPassword';
 import VerifyEmail from './pages/auth/VerifyEmail';
 
 // Páginas del panel admin
@@ -97,8 +98,9 @@ const App = () => {
             <Route path="/cuenta-mayorista" element={<ShopLayout><CustomerAccount /></ShopLayout>} />
           </Route>
 
-          {/* Verificar email — siempre accesible (el link llega por email) */}
+          {/* Verificar email y reset password — siempre accesibles (el link llega por email) */}
           <Route path="/verificar-email/:token" element={<VerifyEmail />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
 
           {/* ── Rutas del cliente logueado ───────────────────────────────── */}
           <Route element={<UserProtectedRoute />}>

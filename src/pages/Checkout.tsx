@@ -170,6 +170,10 @@ const Checkout = () => {
       notas,
       cuponCodigo: cuponAplicado?.codigo,
     });
+    // Persiste los datos de entrega para prellenar el form en la próxima compra
+    if (!estaAutenticado) {
+      localStorage.setItem('gifty-datos-entrega', JSON.stringify(cliente));
+    }
     setPedidoConfirmado(pedido.numeroPedido);
     vaciarCarrito();
   };
@@ -407,7 +411,7 @@ const Checkout = () => {
 
           {/* Dirección (envío) */}
           <div className="mb-3">
-            <label className={labelCls}>En caso de ser envío: <span className="text-gray-400 text-xs font-normal">(opcional)</span></label>
+            <label className={labelCls}>Dirección <span className="text-red-500">*</span></label>
             <input
               {...register('direccion', { required: 'Obligatorio' })}
               placeholder="Av. Corrientes 1234"

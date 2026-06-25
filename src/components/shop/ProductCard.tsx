@@ -40,12 +40,6 @@ const ProductCard = ({ producto }: ProductCardProps) => {
           </div>
         </div>
 
-        {/* Badge sin stock */}
-        {producto.stock === 0 && (
-          <span className="absolute top-2 right-2 bg-gray-600 text-white text-xs font-bold px-2 py-0.5">
-            Sin stock
-          </span>
-        )}
       </Link>
 
       {/* Nombre */}
@@ -68,16 +62,14 @@ const ProductCard = ({ producto }: ProductCardProps) => {
       {tieneDescuento ? (
         <button
           onClick={() => addToCart(producto, 1)}
-          disabled={producto.stock === 0}
-          className="w-full border border-black font-black text-gray-800 text-[10px] py-1 px-3 text-center disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full border border-black font-black text-gray-800 text-[10px] py-1 px-3 text-center"
         >
           Efectivo {pctEfectivo}% Off: {formatearPrecio(precioEfectivo)}
         </button>
       ) : (
         <button
           onClick={() => addToCart(producto, 1)}
-          disabled={producto.stock === 0}
-          className="w-full border border-black font-black text-gray-800 text-[10px] py-1 px-3 text-center disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full border border-black font-black text-gray-800 text-[10px] py-1 px-3 text-center"
         >
           Agregar al carrito
         </button>

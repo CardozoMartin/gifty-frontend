@@ -212,9 +212,6 @@ const ProductDetail = () => {
               Solo quedan {producto.stock} disponibles
             </p>
           )}
-          {producto.stock === 0 && (
-            <p className="text-sm font-bold text-red-500 mb-4">Sin stock</p>
-          )}
 
           {/* Descripción */}
           <p className="text-gray-600 text-sm leading-relaxed mb-6">
@@ -222,8 +219,7 @@ const ProductDetail = () => {
           </p>
 
           {/* Selector de cantidad + botón agregar */}
-          {producto.stock > 0 && (
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-6">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-6">
               {/* Control de cantidad */}
               <div className="flex items-center border border-gray-300 rounded">
                 <button
@@ -253,7 +249,6 @@ const ProductDetail = () => {
                 </span>
               </button>
             </div>
-          )}
 
           {/* Categoría */}
           <p className="text-xs text-gray-400 uppercase tracking-wide mb-6">

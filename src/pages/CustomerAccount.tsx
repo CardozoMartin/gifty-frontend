@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { Eye, EyeOff, Loader2, CheckCircle2, AlertCircle, LogOut, User, MapPin, Lock } from 'lucide-react';
-import { userAuthService, LoginData, RegisterData, PerfilData } from '../services/userAuthService';
+import { userAuthService, LoginData, RegisterData } from '../services/userAuthService';
 import { useUserAuthStore } from '../store/userAuthStore';
 import { usePerfil, useUpdatePerfil } from '../hooks/usePerfil';
 
@@ -61,6 +62,7 @@ const PanelPerfil = () => {
   const [seccion, setSeccion] = useState<'datos' | 'entrega' | 'password'>('datos');
   const [msgPersonales, setMsgPersonales] = useState('');
   const [msgEntrega, setMsgEntrega] = useState('');
+  const [msgPassword, setMsgPassword] = useState('');
 
   const {
     register: regPersonal,
@@ -279,7 +281,7 @@ const PanelPerfil = () => {
               className="flex items-center gap-2 bg-rosa text-white text-sm font-semibold px-5 py-2.5 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
             >
               {actualizarPerfil.isPending && <Loader2 size={14} className="animate-spin" />}
-              Guardar datosdsadsa
+              Guardar datos
             </button>
           </div>
         </form>
@@ -287,10 +289,23 @@ const PanelPerfil = () => {
 
       {seccion === 'password' && (
         <form
-          onSubmit={handlePass(async () => { resetPass(); })}
+          onSubmit={handlePass(async (datos) => {
+            setMsgPassword('');
+            try {
+              await userAuthService.cambiarPassword(datos.passwordActual, datos.passwordNueva);
+              setMsgPassword('ok');
+              resetPass();
+            } catch (e: any) {
+              setMsgPassword(e.message || 'Error al cambiar la contraseña');
+            }
+            setTimeout(() => setMsgPassword(''), 4000);
+          })}
           className="bg-white border border-gray-200 rounded-xl p-6 space-y-4"
         >
           <h3 className="font-semibold text-marino mb-2">Cambiar contraseña</h3>
+
+          {msgPassword === 'ok' && <Alerta tipo="ok" mensaje="¡Contraseña actualizada correctamente!" />}
+          {msgPassword && msgPassword !== 'ok' && <Alerta tipo="error" mensaje={msgPassword} />}
 
           <div>
             <label className={labelCls}>Contraseña actual <span className="text-rosa">*</span></label>
@@ -418,9 +433,9 @@ const FormLogin = () => {
             {cargando && <Loader2 size={15} className="animate-spin" />}
             {cargando ? 'Ingresando...' : 'Iniciar sesión'}
           </button>
-          <a href="/recuperar-password" className="text-xs text-rosa hover:underline">
+          <Link to="/recuperar-password" className="text-xs text-rosa hover:underline">
             ¿Olvidaste tu contraseña?
-          </a>
+          </Link>
         </div>
       </form>
     </div>

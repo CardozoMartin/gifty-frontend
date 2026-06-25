@@ -67,4 +67,9 @@ export const userAuthService = {
     const res = await api.post(`/usuarios/reset-password/${token}`, { password });
     return res.data;
   },
+
+  cambiarPassword: async (passwordActual: string, passwordNueva: string): Promise<{ ok: boolean; mensaje: string }> => {
+    const res = await api.post('/usuarios/cambiar-password', { passwordActual, passwordNueva });
+    return res.data;
+  },
 };
